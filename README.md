@@ -1,11 +1,12 @@
 # README
 
-Very primitive scripts for arduino projects.
+Very primitive helper scripts for arduino projects.
 
 They include: 
 
 - a simple dependency manager 
 - a simple version bumper
+- a simple code formatter
 
 ## Dependency manager
 
