@@ -11,6 +11,9 @@
 # - mauriciojost/log4ino-arduino#1.0.0
 # - git@bitbucket.org:mauriciojost/main4ino-arduino.git#master
 # 
+# It picks up files from each repository and simlynks them into 
+# src directory.
+# 
 # This is also an attempt to stop using platformio, because: 
 # - the community support is not very mature yet
 # - its dependency management features are not satisfactory
