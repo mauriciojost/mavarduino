@@ -21,8 +21,10 @@ function run_test() {
   #echo "HEADERS: $headers"
   #echo "SOURCES C: $src_c"
   #echo "SOURCES C++: $src_cpp"
+  GCOV="-fprofile-arcs -ftest-coverage -fPIC -O0"
 
-  g++ -Wno-deprecated-declarations -g -ggdb -o simulator.bin $flags $src_c $src_cpp $src_unity $main_src $headers -I src $headers_unity
+
+  g++ $GCOV -Wno-deprecated-declarations -g -ggdb -o simulator.bin $flags $src_c $src_cpp $src_unity $main_src $headers -I src $headers_unity
 
   ./simulator.bin
   #gdbtui simulator.bin
@@ -47,8 +49,20 @@ for f in $(find test -name *.cpp)
 do
   echo ""
   echo ""
-  echo "### Running $f"
+  echo "### Running test $f"
   echo ""
   echo ""
   run_test "$f" "$test_general_flags" "$test_excludes_pattern"
 done
+
+echo "### Preparing gcovr report"
+export report=gcovr.html
+gcovr -r . --html -o $report
+readlink -e $report
+rm *.gcda *.gcno
+
+echo "### Done"
+  
+
+
+
