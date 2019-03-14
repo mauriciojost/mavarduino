@@ -21,20 +21,23 @@ function run_test() {
   #echo "HEADERS: $headers"
   #echo "SOURCES C: $src_c"
   #echo "SOURCES C++: $src_cpp"
+  
+  rm -f ./tester.bin
   GCOV="-fprofile-arcs -ftest-coverage -fPIC -O0"
 
+  cmd_l="g++ $GCOV -Wno-deprecated-declarations -g -ggdb -o tester.bin $flags "$PLATFORMIO_BUILD_FLAGS" $src_c $src_cpp $src_unity $main_src $headers -I src $headers_unity"
+  $cmd_l 
 
-  g++ $GCOV -Wno-deprecated-declarations -g -ggdb -o simulator.bin $flags $src_c $src_cpp $src_unity $main_src $headers -I src $headers_unity
+  ./tester.bin
+  #cgdb tester.bin
 
-  ./simulator.bin
-  #gdbtui simulator.bin
-
-  rm ./simulator.bin
-
+  rm ./tester.bin
 }
 
 
 source mavarduino.conf
+
+test_setup # must be present in mavarduino.conf
 
 if [ "$is_library" == "true" ]
 then
@@ -43,7 +46,6 @@ else
   echo "### Testing a final project (not a library)"
   platformio run
 fi
-
 
 for f in $(find test -name *.cpp)
 do
@@ -55,11 +57,18 @@ do
   run_test "$f" "$test_general_flags" "$test_excludes_pattern"
 done
 
-echo "### Preparing gcovr report"
-export report=gcovr.html
-gcovr -r . --html -o $report
-readlink -e $report
-rm *.gcda *.gcno
+# if gcovr is installed
+if [ -f "/usr/local/bin/gcovr" ]
+then
+  echo "### Preparing gcovr reports"
+  export report_html=gcovr.html
+  export report_xml=gcovr.xml
+  gcovr -r . --html --html-details -o $report_html --exclude 'libs/.*' --exclude 'test/.*'
+  gcovr -r . --xml --xml-pretty --exclude 'libs/.*' --exclude 'test/.*' > $report_xml
+  readlink -e $report_html
+  readlink -e $report_xml
+  rm *.gcda *.gcno
+fi
 
 echo "### Done"
   
