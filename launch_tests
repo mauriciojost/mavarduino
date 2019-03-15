@@ -61,13 +61,12 @@ done
 if [ -f "/usr/local/bin/gcovr" ]
 then
   echo "### Preparing gcovr reports"
-  export report_html=gcovr.html
-  export report_xml=gcovr.xml
+  export report_html=coverage.html
+  export report_xml=coverage.xml
   gcovr -r . --html --html-details -o $report_html --exclude 'libs/.*' --exclude 'test/.*'
-  gcovr -r . --xml --xml-pretty --exclude 'libs/.*' --exclude 'test/.*' > $report_xml
+  gcovr -r . --xml --xml-pretty --exclude 'libs/.*' --exclude 'test/.*' --delete > $report_xml
   readlink -e $report_html
   readlink -e $report_xml
-  rm *.gcda *.gcno
 fi
 
 echo "### Done"
