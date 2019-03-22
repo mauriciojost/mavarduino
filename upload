@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+# https://github.com/mauriciojost/mavarduino
+#
+# Mavarduino Firmware Uploader (ESP8266)
+# 
+# This script will allow to:
+# - compile and upload firmware (via serial and OTA)
+# - upload SPIFF files
+#
+
+
 set -e
 set -x
 
