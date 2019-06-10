@@ -1,0 +1,11 @@
+{
+  "name": "mavarduino",
+  "version": "0.0.2",
+  "keywords": "simple,package,manager",
+  "description": "Simple package manager for Arduino projects",
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket.org:mauriciojost/mavarduino.git"
+  },
+  "frameworks": "arduino"
+}
