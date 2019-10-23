@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# https://github.com/mauriciojost/mavarduino
+#
+# Mavarduino Symlinks Creator
+# 
+# Creates symlinks to mavarduino scripts into your project directory, so that they can be called conveniently.
+#
+
+find mavarduino -executable | xargs -I% ln -s % .
