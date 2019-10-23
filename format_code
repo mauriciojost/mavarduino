@@ -2,11 +2,11 @@
 
 # https://github.com/mauriciojost/mavarduino
 #
-# Mavarduino Code Formatter (based on clang-format-3.7)
+# Mavarduino Code Formatter (based on clang-format-x.x, see code)
 # 
 # This script will perform code formatting based on the 
 # provided clang configuration file.
 #
 
-find src/ test/  -type f | xargs -I% clang-format -style=file -i -fallback-style=none %
+find src/ test/  -type f | xargs -I% clang-format-5.0 -style=file -i -fallback-style=none %
 

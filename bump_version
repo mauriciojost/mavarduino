@@ -9,8 +9,6 @@
 
 export BUMP=${1:-PATCH} # can be MAJOR, MINOR or PATCH
 
-set -e
-
 CURR_BRANCH=`git rev-parse --abbrev-ref HEAD`
 if [ "$CURR_BRANCH" != "master" ]
 then

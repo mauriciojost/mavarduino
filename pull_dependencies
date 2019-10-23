@@ -33,7 +33,7 @@ do
   esac
 done
 
-root_dir=`dirname $(readlink -e $0)`
+root_dir=`pwd`
 config_file=${CONFIG_FILE:-mavarduino.conf}
 libs_dir=$root_dir/libs
 src_dir=$root_dir/src
