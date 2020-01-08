@@ -32,7 +32,12 @@ done
 
 VERSION=`cat library.json | python -c 'import sys, json; print json.load(sys.stdin)["version"]'`
 COMMIT_ID="`git rev-parse --short HEAD`"
-PROJ_VERSION_ID="$VERSION-$COMMIT_ID" 
+if [[ $VERSION == *SNAPSHOT ]]
+then
+  PROJ_VERSION_ID="$VERSION-$COMMIT_ID" 
+else
+  PROJ_VERSION_ID="$VERSION" 
+fi
 LOG_SUBDIR=images
 EXPORT_SUBDIR=exports/$PIO_ENVIRONMENT/
 
