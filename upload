@@ -32,9 +32,10 @@ done
 
 VERSION=`cat library.json | python -c 'import sys, json; print json.load(sys.stdin)["version"]'`
 COMMIT_ID="`git rev-parse --short HEAD`" # current commit id
-COMMIT_ID_OF_VERSION="`git rev-parse --short $VERSION`" # commit id with the tag
+COMMIT_ID_LONG="`git rev-parse HEAD`" # current commit id
+COMMIT_ID_OF_VERSION="`git rev-list -n 1 $VERSION`" # commit id with the tag
 
-if [ "$COMMIT_ID_OF_VERSION" == "$COMMIT_ID" ]
+if [ "$COMMIT_ID_OF_VERSION" == "$COMMIT_ID_LONG" ]
 then
   echo "Current commit is tagged with version $VERSION"
   PROJ_VERSION_ID="$VERSION" 
