@@ -58,6 +58,7 @@ git commit -s -m "Bump to $NEW_VERSION"
 git tag "$NEW_VERSION" -m "$NEW_VERSION"
 
 echo "### Pushing to git..."
+git push
 git push --tags
 
 echo "### Done."
