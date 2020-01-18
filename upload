@@ -33,7 +33,9 @@ done
 VERSION=`cat library.json | python -c 'import sys, json; print json.load(sys.stdin)["version"]'`
 COMMIT_ID="`git rev-parse --short HEAD`" # current commit id
 COMMIT_ID_LONG="`git rev-parse HEAD`" # current commit id
+set +e
 COMMIT_ID_OF_VERSION="`git log -1 $VERSION --format=%H`" # commit id with the tag
+set -e
 
 if [ "$COMMIT_ID_OF_VERSION" == "$COMMIT_ID_LONG" ]
 then
