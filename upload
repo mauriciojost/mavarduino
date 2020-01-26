@@ -30,7 +30,7 @@ do
   esac
 done
 
-VERSION=`cat library.json | python -c 'import sys, json; print json.load(sys.stdin)["version"]'`
+VERSION=`cat library.json | python2.7 -c 'import sys, json; print json.load(sys.stdin)["version"]'`
 COMMIT_ID="`git rev-parse --short HEAD`" # current commit id
 COMMIT_ID_LONG="`git rev-parse HEAD`" # current commit id
 set +e
