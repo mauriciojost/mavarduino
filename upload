@@ -13,7 +13,7 @@
 set -e
 set -x
 
-curr_dir=$(readlink -e $(dirname $0))
+curr_dir=$(dirname $(readlink -e $0))
 source $curr_dir/source.sh
 
 while getopts n:p:fms:vyebo: option

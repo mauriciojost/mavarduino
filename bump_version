@@ -9,7 +9,7 @@
 
 export BUMP=${1:-PATCH} # can be MAJOR, MINOR or PATCH
 
-curr_dir=$(readlink -e $(dirname $0))
+curr_dir=$(dirname $(readlink -e $0))
 source $curr_dir/source.sh
 
 CURR_BRANCH=`git rev-parse --abbrev-ref HEAD`
