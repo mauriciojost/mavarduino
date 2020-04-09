@@ -11,12 +11,12 @@
 
 
 set -e
-set -x
+#set -x
 
 curr_dir=$(dirname $(readlink -e $0))
 source $curr_dir/source.sh
 
-while getopts n:p:fms:vyebo: option
+while getopts n:p:fms:vyeibo: option
 do
   case "${option}"
   in
@@ -28,6 +28,7 @@ do
     v) PLATFORMIO_RUN_PARAMS="-v";;
     y) IGNORE_UNCOMMITED_CHANGES=true;;
     e) EXPORT_FIRMWARE_FILE=true;;
+    i) EXPORT_FIRMWARE_FILE_VERSION=true;;
     b) BACKUP_IMAGE=true;;
     o) UPLOAD_OTA_IP=${OPTARG};;
   esac
@@ -43,11 +44,15 @@ COMMIT_NUMBER="`git rev-list HEAD --count`"
 
 if [ "$COMMIT_ID_OF_VERSION" == "$COMMIT_ID_LONG" ]
 then
-  echo "Current commit is tagged with version $VERSION"
   PROJ_VERSION_ID="$VERSION" 
 else
-  echo "Current commit is different than tag $VERSION"
   PROJ_VERSION_ID="`bump $VERSION PATCH`-$COMMIT_NUMBER" 
+fi
+
+if [ -n "EXPORT_FIRMWARE_FILE_VERSION" ]
+then
+  echo "$PROJ_VERSION_ID"
+  exit 0
 fi
 
 LOG_SUBDIR=images
