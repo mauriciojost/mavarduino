@@ -36,6 +36,7 @@ COMMIT_ID_LONG="`git rev-parse HEAD`" # current commit id
 set +e
 COMMIT_ID_OF_VERSION="`git log -1 $VERSION --format=%H`" # commit id with the tag
 set -e
+COMMIT_NUMBER="`git rev-list HEAD --count`"
 
 if [ "$COMMIT_ID_OF_VERSION" == "$COMMIT_ID_LONG" ]
 then
@@ -43,7 +44,7 @@ then
   PROJ_VERSION_ID="$VERSION" 
 else
   echo "Current commit is different than tag $VERSION"
-  PROJ_VERSION_ID="$VERSION+$COMMIT_ID" 
+  PROJ_VERSION_ID="$VERSION+$COMMIT_NUMBER" 
 fi
 
 LOG_SUBDIR=images
