@@ -9,6 +9,9 @@
 
 export BUMP=${1:-PATCH} # can be MAJOR, MINOR or PATCH
 
+curr_dir=$(readlink -e $(dirname $0))
+source $curr_dir/source.sh
+
 CURR_BRANCH=`git rev-parse --abbrev-ref HEAD`
 if [ "$CURR_BRANCH" != "master" ]
 then
@@ -23,32 +26,9 @@ function inc() {
 
 echo "### Parsing current version ..."
 export VERSION=`cat library.json |  jq  .version | sed 's/"//g'`
-export MAJOR=`echo $VERSION | awk -F'[.-]' '{printf $1}'`
-export MINOR=`echo $VERSION | awk -F'[.-]' '{printf $2}'`
-export PATCH=`echo $VERSION | awk -F'[.-]' '{printf $3}'`
 
-echo "### Computing new version ..."
-if [ "$BUMP" == "MAJOR" ]
-then
-  export NEW_MAJOR=`inc $MAJOR`
-  export NEW_MINOR=0
-  export NEW_PATCH=0
-elif [ "$BUMP" == "MINOR" ]
-then
-  export NEW_MAJOR=$MAJOR
-  export NEW_MINOR=`inc $MINOR`
-  export NEW_PATCH=0
-elif [ "$BUMP" == "PATCH" ]
-then
-  export NEW_MAJOR=$MAJOR
-  export NEW_MINOR=$MINOR
-  export NEW_PATCH=`inc $PATCH`
-else
-  echo "Must choose between MAJOR, MINOR or PATCH bump"
-  exit 1
-fi
 
-export NEW_VERSION="$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH"
+export NEW_VERSION=`bump $VERSION $BUMP`
 
 echo "### Creating commit and tags for new version: $NEW_VERSION ..."
 sed -i "s/$VERSION-SNAPSHOT/$NEW_VERSION/g" library.json 

@@ -13,6 +13,9 @@
 set -e
 set -x
 
+curr_dir=$(readlink -e $(dirname $0))
+source $curr_dir/source.sh
+
 while getopts n:p:fms:vyebo: option
 do
   case "${option}"
@@ -44,7 +47,7 @@ then
   PROJ_VERSION_ID="$VERSION" 
 else
   echo "Current commit is different than tag $VERSION"
-  PROJ_VERSION_ID="$VERSION+$COMMIT_NUMBER" 
+  PROJ_VERSION_ID="`bump $VERSION PATCH`-$COMMIT_NUMBER" 
 fi
 
 LOG_SUBDIR=images
