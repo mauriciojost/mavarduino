@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+function inc() {
+  local i=$1
+  echo `echo $i + 1 | bc`
+}
+
 function bump() {
 
   local VERSION="$1"
