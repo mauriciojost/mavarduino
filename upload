@@ -11,7 +11,7 @@
 
 
 set -e
-#set -x
+set -x
 
 curr_dir=$(dirname $(readlink -e $0))
 source $curr_dir/source.sh
@@ -49,7 +49,7 @@ else
   PROJ_VERSION_ID="`bump $VERSION PATCH`-$COMMIT_NUMBER" 
 fi
 
-if [ -n "EXPORT_FIRMWARE_FILE_VERSION" ]
+if [ -n "$EXPORT_FIRMWARE_FILE_VERSION" ]
 then
   echo "$PROJ_VERSION_ID"
   exit 0
