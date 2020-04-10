@@ -2,7 +2,8 @@
 
 function inc() {
   local i=$1
-  echo `echo $i + 1 | bc`
+  sum=$(( $i + 1 ))
+  echo $sum
 }
 
 function bump() {
