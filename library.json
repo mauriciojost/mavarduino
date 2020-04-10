@@ -1,6 +1,6 @@
 {
   "name": "mavarduino",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "keywords": "simple,package,manager",
   "description": "Simple package manager for Arduino projects",
   "repository": {
