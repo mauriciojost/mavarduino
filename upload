@@ -50,14 +50,6 @@ else
   PROJ_VERSION_ID="`bump $VERSION PATCH`-$COMMIT_NUMBER" 
 fi
 
-if [[ $BRANCH_NAME == feature/* ]]
-then
-  FEATURE=`echo $BRANCH_NAME | sed 's/feature\///'`
-  FIRMWARE_FILENAME="firmware-${PROJ_VERSION_ID}_$FEATURE.$PIO_ENVIRONMENT.bin"
-else
-  FIRMWARE_FILENAME="firmware-$PROJ_VERSION_ID.$PIO_ENVIRONMENT.bin"
-fi
-
 if [ -n "$EXPORT_FIRMWARE_FILE_VERSION" ]
 then
   echo "$PROJ_VERSION_ID"
@@ -88,6 +80,15 @@ then
   echo "### Exporting firmware file..."
   rm -fr $EXPORT_SUBDIR/
   mkdir -p $EXPORT_SUBDIR/
+
+  if [[ $BRANCH_NAME == feature/* ]]
+  then
+    FEATURE=`echo $BRANCH_NAME | sed 's/feature\///'`
+    FIRMWARE_FILENAME="firmware-${PROJ_VERSION_ID}_$FEATURE.$PIO_ENVIRONMENT.bin"
+  else
+    FIRMWARE_FILENAME="firmware-$PROJ_VERSION_ID.$PIO_ENVIRONMENT.bin"
+  fi
+
   cp .pioenvs/$PIO_ENVIRONMENT/firmware.bin $EXPORT_SUBDIR/$FIRMWARE_FILENAME
 fi
 
