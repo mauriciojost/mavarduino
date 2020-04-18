@@ -41,12 +41,21 @@ set +e
 COMMIT_ID_OF_VERSION="`git log -1 $VERSION --format=%H`" # commit id with the tag
 set -e
 COMMIT_NUMBER="`git rev-list HEAD --count`"
+BRANCH_NAME="`git rev-parse --abbrev-ref HEAD`"
 
 if [ "$COMMIT_ID_OF_VERSION" == "$COMMIT_ID_LONG" ]
 then
   PROJ_VERSION_ID="$VERSION" 
 else
   PROJ_VERSION_ID="`bump $VERSION PATCH`-$COMMIT_NUMBER" 
+fi
+
+if [[ $BRANCH_NAME == feature/* ]]
+then
+  FEATURE=`echo $BRANCH_NAME | sed 's/feature\///'`
+  FIRMWARE_FILENAME="firmware-$PROJ_VERSION_ID_$FEATURE.$PIO_ENVIRONMENT.bin"
+else
+  FIRMWARE_FILENAME="firmware-$PROJ_VERSION_ID.$PIO_ENVIRONMENT.bin"
 fi
 
 if [ -n "$EXPORT_FIRMWARE_FILE_VERSION" ]
@@ -79,7 +88,7 @@ then
   echo "### Exporting firmware file..."
   rm -fr $EXPORT_SUBDIR/
   mkdir -p $EXPORT_SUBDIR/
-  cp .pioenvs/$PIO_ENVIRONMENT/firmware.bin $EXPORT_SUBDIR/firmware-$PROJ_VERSION_ID.$PIO_ENVIRONMENT.bin
+  cp .pioenvs/$PIO_ENVIRONMENT/firmware.bin $EXPORT_SUBDIR/$FIRMWARE_FILENAME
 fi
 
 if [ -n "$UPLOAD_FIRMWARE" ]
