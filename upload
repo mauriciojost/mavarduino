@@ -82,9 +82,15 @@ then
   rm -fr $EXPORT_SUBDIR/
   mkdir -p $EXPORT_SUBDIR/
 
-  if [ -n "$FEATURE" ]
+  if [ -n "$FEATURE" ] # specified explicitly
   then
-    FIRMWARE_FILENAME="firmware-${PROJ_VERSION_ID}_$FEATURE.$PIO_ENVIRONMENT.bin"
+    if [[ $BRANCH_NAME == feature/* ]] # collision with feature coming from branch
+    then
+      FEATURE_FROM_BRANCH=`echo $BRANCH_NAME | sed 's/feature\///'`
+      FIRMWARE_FILENAME="firmware-${PROJ_VERSION_ID}_$FEATURE$FEATURE_FROM_BRANCH.$PIO_ENVIRONMENT.bin" # use both
+    else
+      FIRMWARE_FILENAME="firmware-${PROJ_VERSION_ID}_$FEATURE.$PIO_ENVIRONMENT.bin"
+    fi
   else if [[ $BRANCH_NAME == feature/* ]]
   then
     FEATURE=`echo $BRANCH_NAME | sed 's/feature\///'`
