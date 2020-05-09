@@ -91,7 +91,7 @@ then
     else
       FIRMWARE_FILENAME="firmware-${PROJ_VERSION_ID}_$FEATURE.$PIO_ENVIRONMENT.bin"
     fi
-  else if [[ $BRANCH_NAME == feature/* ]]
+  elif [[ $BRANCH_NAME == feature/* ]]
   then
     FEATURE=`echo $BRANCH_NAME | sed 's/feature\///'`
     FIRMWARE_FILENAME="firmware-${PROJ_VERSION_ID}_$FEATURE.$PIO_ENVIRONMENT.bin"
