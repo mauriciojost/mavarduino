@@ -16,7 +16,7 @@ set -x
 curr_dir=$(dirname $(readlink -e $0))
 source $curr_dir/source.sh
 
-while getopts n:p:fms:vyeibo: option
+while getopts n:p:fms:vyeibo:t: option
 do
   case "${option}"
   in
@@ -31,6 +31,7 @@ do
     i) EXPORT_FIRMWARE_FILE_VERSION=true;;
     b) BACKUP_IMAGE=true;;
     o) UPLOAD_OTA_IP=${OPTARG};;
+    t) FEATURE=${OPTARG};;
   esac
 done
 
@@ -81,7 +82,10 @@ then
   rm -fr $EXPORT_SUBDIR/
   mkdir -p $EXPORT_SUBDIR/
 
-  if [[ $BRANCH_NAME == feature/* ]]
+  if [ -n "$FEATURE" ]
+  then
+    FIRMWARE_FILENAME="firmware-${PROJ_VERSION_ID}_$FEATURE.$PIO_ENVIRONMENT.bin"
+  else if [[ $BRANCH_NAME == feature/* ]]
   then
     FEATURE=`echo $BRANCH_NAME | sed 's/feature\///'`
     FIRMWARE_FILENAME="firmware-${PROJ_VERSION_ID}_$FEATURE.$PIO_ENVIRONMENT.bin"
