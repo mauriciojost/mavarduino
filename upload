@@ -58,7 +58,6 @@ then
 fi
 
 LOG_SUBDIR=images
-EXPORT_SUBDIR=exports/$PIO_ENVIRONMENT/
 
 if [ -z "$PROFILE" ]
 then
@@ -78,9 +77,6 @@ fi
 
 if [ -n "$EXPORT_FIRMWARE_FILE" ]
 then
-  echo "### Exporting firmware file..."
-  rm -fr $EXPORT_SUBDIR/
-  mkdir -p $EXPORT_SUBDIR/
 
   if [ -n "$FEATURE" ] # specified explicitly
   then
@@ -98,6 +94,13 @@ then
   else
     FIRMWARE_FILENAME="firmware-$PROJ_VERSION_ID.$PIO_ENVIRONMENT.bin"
   fi
+
+  echo "### Exporting firmware file..."
+
+  EXPORT_SUBDIR=exports/$PIO_ENVIRONMENT/feature=$FEATURE/
+  rm -fr $EXPORT_SUBDIR/
+  mkdir -p $EXPORT_SUBDIR/
+
 
   cp .pioenvs/$PIO_ENVIRONMENT/firmware.bin $EXPORT_SUBDIR/$FIRMWARE_FILENAME
 fi
