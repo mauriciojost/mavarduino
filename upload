@@ -35,25 +35,25 @@ do
   esac
 done
 
-VERSION=`cat library.json | python2.7 -c 'import sys, json; print json.load(sys.stdin)["version"]'`
+VERSION_FROM_LIBRARY_JSON=`cat library.json | python2.7 -c 'import sys, json; print json.load(sys.stdin)["version"]'`
 COMMIT_ID="`git rev-parse --short HEAD`" # current commit id
 COMMIT_ID_LONG="`git rev-parse HEAD`" # current commit id
 set +e
-COMMIT_ID_OF_VERSION="`git log -1 $VERSION --format=%H`" # commit id with the tag
+COMMIT_ID_OF_VERSION_TAG="`git log -1 $VERSION_FROM_LIBRARY_JSON --format=%H`" # commit id with the tag
 set -e
-COMMIT_NUMBER="`git rev-list HEAD --count`"
+COMMIT_NUMBER_SINCE_FIRST_COMMIT="`git rev-list HEAD --count`"
 BRANCH_NAME=${BRANCH_NAME:-"`git rev-parse --abbrev-ref HEAD`"}
 
-if [ "$COMMIT_ID_OF_VERSION" == "$COMMIT_ID_LONG" ]
+if [ "$COMMIT_ID_OF_VERSION_TAG" == "$COMMIT_ID_LONG" ] # for it to work: Branch sources -> Git -> Advanced clone behaviour -> Fetch tags = enabled
 then
-  PROJ_VERSION_ID="$VERSION" 
+  RESOLVED_VERSION="$VERSION_FROM_LIBRARY_JSON" 
 else
-  PROJ_VERSION_ID="`bump $VERSION PATCH`-$COMMIT_NUMBER" 
+  RESOLVED_VERSION="`bump $VERSION_FROM_LIBRARY_JSON PATCH`-$COMMIT_NUMBER_SINCE_FIRST_COMMIT" 
 fi
 
 if [ -n "$EXPORT_FIRMWARE_FILE_VERSION" ]
 then
-  echo "$PROJ_VERSION_ID"
+  echo "$RESOLVED_VERSION"
   exit 0
 fi
 
@@ -66,7 +66,7 @@ then
 fi
 
 echo "### Using profile $PROFILE..."
-export PLATFORMIO_BUILD_FLAGS="-D PROJ_VERSION=$PROJ_VERSION_ID `cat $PROFILE | grep -v '^#'`" 
+export PLATFORMIO_BUILD_FLAGS="-D PROJ_VERSION=$RESOLVED_VERSION `cat $PROFILE | grep -v '^#'`" 
 
 # For uploading a compilation is required, so no need to force it here
 if [ -z "$UPLOAD_FIRMWARE" ]
@@ -83,16 +83,16 @@ then
     if [[ $BRANCH_NAME == feature/* ]] # collision with feature coming from branch
     then
       FEATURE_FROM_BRANCH=`echo $BRANCH_NAME | sed 's/feature\///'`
-      FIRMWARE_FILENAME="firmware-${PROJ_VERSION_ID}_$FEATURE$FEATURE_FROM_BRANCH.$PIO_ENVIRONMENT.bin" # use both
+      FIRMWARE_FILENAME="firmware-${RESOLVED_VERSION}_$FEATURE$FEATURE_FROM_BRANCH.$PIO_ENVIRONMENT.bin" # use both
     else
-      FIRMWARE_FILENAME="firmware-${PROJ_VERSION_ID}_$FEATURE.$PIO_ENVIRONMENT.bin"
+      FIRMWARE_FILENAME="firmware-${RESOLVED_VERSION}_$FEATURE.$PIO_ENVIRONMENT.bin"
     fi
   elif [[ $BRANCH_NAME == feature/* ]]
   then
     FEATURE=`echo $BRANCH_NAME | sed 's/feature\///'`
-    FIRMWARE_FILENAME="firmware-${PROJ_VERSION_ID}_$FEATURE.$PIO_ENVIRONMENT.bin"
+    FIRMWARE_FILENAME="firmware-${RESOLVED_VERSION}_$FEATURE.$PIO_ENVIRONMENT.bin"
   else
-    FIRMWARE_FILENAME="firmware-$PROJ_VERSION_ID.$PIO_ENVIRONMENT.bin"
+    FIRMWARE_FILENAME="firmware-$RESOLVED_VERSION.$PIO_ENVIRONMENT.bin"
   fi
 
   echo "### Exporting firmware file..."
@@ -126,9 +126,9 @@ then
   if [ -n "$BACKUP_IMAGE" ]
   then
     echo "### Backing up image..."
-    mkdir -p $LOG_SUBDIR/$PROJ_VERSION_ID/
-    rm -f $LOG_SUBDIR/$PROJ_VERSION_ID/*
-    find . -name *.elf | xargs -I% cp -f % $LOG_SUBDIR/$PROJ_VERSION_ID/
+    mkdir -p $LOG_SUBDIR/$RESOLVED_VERSION/
+    rm -f $LOG_SUBDIR/$RESOLVED_VERSION/*
+    find . -name *.elf | xargs -I% cp -f % $LOG_SUBDIR/$RESOLVED_VERSION/
   fi
 
 fi
@@ -148,9 +148,9 @@ fi
 if [ -n "$MONITOR" ]
 then
   echo "### Backing up logs..."
-  mkdir -p $LOG_SUBDIR/$PROJ_VERSION_ID/
+  mkdir -p $LOG_SUBDIR/$RESOLVED_VERSION/
   echo "### Monitoring..."
-  { ./serial_monitor 0 > >(tee $LOG_SUBDIR/$PROJ_VERSION_ID/stdout.txt ); } 2> >(tee $LOG_SUBDIR/$PROJ_VERSION_ID/stderr.txt )
+  { ./serial_monitor 0 > >(tee $LOG_SUBDIR/$RESOLVED_VERSION/stdout.txt ); } 2> >(tee $LOG_SUBDIR/$RESOLVED_VERSION/stderr.txt )
 fi
 
 echo "Done."
