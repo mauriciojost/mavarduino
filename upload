@@ -103,6 +103,7 @@ then
 
 
   cp .pioenvs/$PIO_ENVIRONMENT/firmware.bin $EXPORT_SUBDIR/$FIRMWARE_FILENAME
+  cp .pioenvs/$PIO_ENVIRONMENT/firmware.elf $EXPORT_SUBDIR/$FIRMWARE_FILENAME.elf
 fi
 
 if [ -n "$UPLOAD_FIRMWARE" ]
