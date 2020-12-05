@@ -7,8 +7,8 @@ function ctrl_c() {
   exit 0;
 }
 
-arg=serialports
-#arg=device
+#arg=serialports
+arg=device
   
 export PORT=$1
 for i in `seq 1 10000`
