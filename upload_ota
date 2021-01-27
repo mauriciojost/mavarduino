@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+platform=$1
+port=$2
+cd .pio/build/$platform/
+if [ -e firmware.bin ]
+then
+  echo "Command to execute on device:"
+  echo "  updd http://ip:$port/firmware.bin"
+  echo "(close this once executed)"
+  /usr/bin/python -m SimpleHTTPServer "$port"
+else
+  echo "Could not find firmware.bin at: $PWD"
+  echo "Skipping..."
+fi
