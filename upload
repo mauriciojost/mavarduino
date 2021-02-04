@@ -87,16 +87,16 @@ then
     if [[ $BRANCH_NAME == feature/* ]] # collision with feature coming from branch
     then
       FEATURE_FROM_BRANCH=`echo $BRANCH_NAME | sed 's/feature\///'`
-      FIRMWARE_FILENAME="firmware-${RESOLVED_VERSION}_$FEATURE$FEATURE_FROM_BRANCH.$PIO_ENVIRONMENT.bin" # use both
+      FIRMWARE_FILENAME_BASE="firmware-${RESOLVED_VERSION}_$FEATURE$FEATURE_FROM_BRANCH.$PIO_ENVIRONMENT" # use both
     else
-      FIRMWARE_FILENAME="firmware-${RESOLVED_VERSION}_$FEATURE.$PIO_ENVIRONMENT.bin"
+      FIRMWARE_FILENAME_BASE="firmware-${RESOLVED_VERSION}_$FEATURE.$PIO_ENVIRONMENT"
     fi
   elif [[ $BRANCH_NAME == feature/* ]]
   then
     FEATURE=`echo $BRANCH_NAME | sed 's/feature\///'`
-    FIRMWARE_FILENAME="firmware-${RESOLVED_VERSION}_$FEATURE.$PIO_ENVIRONMENT.bin"
+    FIRMWARE_FILENAME_BASE="firmware-${RESOLVED_VERSION}_$FEATURE.$PIO_ENVIRONMENT"
   else
-    FIRMWARE_FILENAME="firmware-$RESOLVED_VERSION.$PIO_ENVIRONMENT.bin"
+    FIRMWARE_FILENAME_BASE="firmware-$RESOLVED_VERSION.$PIO_ENVIRONMENT"
   fi
 
   echo "### Exporting firmware file..."
@@ -105,9 +105,12 @@ then
   rm -fr $EXPORT_SUBDIR/
   mkdir -p $EXPORT_SUBDIR/
 
-
-  cp .pioenvs/$PIO_ENVIRONMENT/firmware.bin $EXPORT_SUBDIR/$FIRMWARE_FILENAME
-  cp .pioenvs/$PIO_ENVIRONMENT/firmware.elf $EXPORT_SUBDIR/$FIRMWARE_FILENAME.elf
+  cp .pioenvs/$PIO_ENVIRONMENT/firmware.bin $EXPORT_SUBDIR/$FIRMWARE_FILENAME_BASE.bin
+  cp .pioenvs/$PIO_ENVIRONMENT/firmware.elf $EXPORT_SUBDIR/$FIRMWARE_FILENAME_BASE.elf
+  if [ -e main4ino-description.json ]
+  then
+    cp main4ino-description.json $EXPORT_SUBDIR/$FIRMWARE_FILENAME_BASE.description.json
+  fi
 fi
 
 if [ -n "$UPLOAD_FIRMWARE" ]
