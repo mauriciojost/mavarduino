@@ -4,7 +4,21 @@ set -x
 set -e
 
 simulator_binary=.mavarduino.simulator.bin
-PROFILE=${1:-profiles/simulate.prof}
+
+function usage() {
+  echo "usage: TODO"
+}
+
+PROFILE="profiles/simulate.prof"
+while getopts p:a:h option
+do
+  case "${option}"
+  in
+    p) PROFILE=${OPTARG};;
+    a) ARGS=${OPTARG};;
+    h) usage
+  esac
+done
 
 root_dir=`pwd`
 config_file=mavarduino.conf
@@ -25,8 +39,7 @@ simulator_flags="-U ARDUINO $PARAM_FLAGS"
 rm -f $simulator_binary
 
 g++ -Wno-deprecated-declarations -g -ggdb -o $simulator_binary $simulator_flags $simulator_src $simulator_headers $simulator_libs
-shift
-./$simulator_binary $@
-#gdbtui ./$simulator_binary
+./$simulator_binary $ARGS
+#gdbtui ./$simulator_binary $ARGS
 
 rm -f $simulator_binary

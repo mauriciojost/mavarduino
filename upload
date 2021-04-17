@@ -16,7 +16,11 @@ set -x
 curr_dir=$(dirname $(readlink -e $0))
 source $curr_dir/source.sh
 
-while getopts n:p:fms:vyeibo:t: option
+function usage() {
+  echo "usage: TODO"
+}
+
+while getopts n:p:fms:vyeibo:t:h option
 do
   case "${option}"
   in
@@ -32,6 +36,7 @@ do
     b) BACKUP_IMAGE=true;;
     o) UPLOAD_OTA_IP=${OPTARG};;
     t) FEATURE=${OPTARG};;
+    h) usage
   esac
 done
 
