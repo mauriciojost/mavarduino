@@ -34,7 +34,7 @@ PROJ_VERSION_ID="$VERSION-$COMMIT_ID"
 
 PARAM_FLAGS="-D X86_64 -D PROJ_VERSION=$PROJ_VERSION_ID `cat $PROFILE | grep -v '^#'`"
 
-simulator_flags="-U ARDUINO -U SIMULATE $PARAM_FLAGS"
+simulator_flags="-U ARDUINO $PARAM_FLAGS"
 
 rm -f $simulator_binary
 
