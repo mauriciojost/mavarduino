@@ -16,23 +16,50 @@ set -x
 curr_dir=$(dirname $(readlink -e $0))
 source $curr_dir/source.sh
 
+export_basedir=exports
+log_basedir=images
+
 function usage() {
-  echo "usage: TODO"
+  cat <<EOL
+  $0 [-h | -p profile [-n env] [-t feature] [-f [-o ip]] [-s dir] [-m] [-e] [-i] [-v] [-y] [-b] ]
+    -h                      # show this help
+
+    # configuration
+    -p Profile_file         # define profile file to be used
+    -n pio_eNvironment      # define environment (esp8266, esp32, ...)
+    -t feaTure              # define the provided feature (will be used when versioning and file naming)
+
+    # tasks
+    -f                      # upload firmware
+    -o upload_Ota_ip        # when uploading firmware, use OTA with provided IP
+    -s upload_fS_dir        # upload files within provided directory
+    -m                      # monitor serial port after upload
+    -e                      # export firmware file with rich naming under directory $export_basedir
+    -i                      # display firmware file version
+
+    # debugging / development
+    -v                      # platformio in verbose mode
+    -y                      # ignore git uncommitted changes
+
+    # ci/cd
+    -b                      # backup the generated image under directory $log_basedir
+EOL
+
 }
 
 while getopts n:p:fms:vyeibo:t:h option
 do
   case "${option}"
   in
-    n) PIO_ENVIRONMENT=${OPTARG};;
-    p) PROFILE=${OPTARG};;
+    n) flag_pio_environment=${OPTARG};;
+    p) flag_profile=${OPTARG};;
     f) UPLOAD_FIRMWARE=true;;
     m) MONITOR=true;;
     s) UPLOAD_FS_DIR=${OPTARG};;
     v) PLATFORMIO_RUN_PARAMS="-v";;
     y) IGNORE_UNCOMMITED_CHANGES=true;;
     e) EXPORT_FIRMWARE_FILE=true;;
-    i) EXPORT_FIRMWARE_FILE_VERSION=true;;
+    i) DISPLAY_FIRMWARE_FILE_VERSION=true;;
     b) BACKUP_IMAGE=true;;
     o) UPLOAD_OTA_IP=${OPTARG};;
     t) FEATURE=${OPTARG};;
@@ -64,23 +91,21 @@ else
   RESOLVED_VERSION="`bump $VERSION_FROM_LIBRARY_JSON PATCH`-$COMMIT_NUMBER_SINCE_FIRST_COMMIT" 
 fi
 
-if [ -n "$EXPORT_FIRMWARE_FILE_VERSION" ]
+if [ -n "$DISPLAY_FIRMWARE_FILE_VERSION" ]
 then
   echo "$RESOLVED_VERSION"
   exit 0
 fi
 
-LOG_SUBDIR=images
-
-if [ -z "$PROFILE" ]
+if [ -z "$flag_profile" ]
 then
-  echo "Variable -p PROFILE is mandatory"
+  echo "Variable -p flag_profile is mandatory"
   exit 1
 fi
 
-echo "### Using profile $PROFILE..."
-CONSTANT_PROFILE=profiles/constants.prof
-export PLATFORMIO_BUILD_FLAGS="-D PROJ_VERSION=$RESOLVED_VERSION $(cat $CONSTANT_PROFILE | grep -v '^#') $(cat $PROFILE | grep -v '^#')" 
+echo "### Using profile $flag_profile..."
+constant_profile=profiles/constants.prof
+export PLATFORMIO_BUILD_FLAGS="-D PROJ_VERSION=$RESOLVED_VERSION $(cat $constant_profile | grep -v '^#') $(cat $flag_profile | grep -v '^#')" 
 
 echo "### Resolved version: $RESOLVED_VERSION"
 echo "### Platformio build flags: $PLATFORMIO_BUILD_FLAGS"
@@ -89,7 +114,7 @@ echo "### Platformio build flags: $PLATFORMIO_BUILD_FLAGS"
 if [ -z "$UPLOAD_FIRMWARE" ]
 then
   echo "### Compiling..."
-  platformio run -e $PIO_ENVIRONMENT $PLATFORMIO_RUN_PARAMS
+  platformio run -e $flag_pio_environment $PLATFORMIO_RUN_PARAMS
 fi
 
 if [ -n "$EXPORT_FIRMWARE_FILE" ]
@@ -100,26 +125,26 @@ then
     if [[ $BRANCH_NAME == feature/* ]] # collision with feature coming from branch
     then
       FEATURE_FROM_BRANCH=`echo $BRANCH_NAME | sed 's/feature\///'`
-      FIRMWARE_FILENAME_BASE="firmware-${RESOLVED_VERSION}_$FEATURE$FEATURE_FROM_BRANCH.$PIO_ENVIRONMENT" # use both
+      FIRMWARE_FILENAME_BASE="firmware-${RESOLVED_VERSION}_$FEATURE$FEATURE_FROM_BRANCH.$flag_pio_environment" # use both
     else
-      FIRMWARE_FILENAME_BASE="firmware-${RESOLVED_VERSION}_$FEATURE.$PIO_ENVIRONMENT"
+      FIRMWARE_FILENAME_BASE="firmware-${RESOLVED_VERSION}_$FEATURE.$flag_pio_environment"
     fi
   elif [[ $BRANCH_NAME == feature/* ]]
   then
     FEATURE=`echo $BRANCH_NAME | sed 's/feature\///'`
-    FIRMWARE_FILENAME_BASE="firmware-${RESOLVED_VERSION}_$FEATURE.$PIO_ENVIRONMENT"
+    FIRMWARE_FILENAME_BASE="firmware-${RESOLVED_VERSION}_$FEATURE.$flag_pio_environment"
   else
-    FIRMWARE_FILENAME_BASE="firmware-$RESOLVED_VERSION.$PIO_ENVIRONMENT"
+    FIRMWARE_FILENAME_BASE="firmware-$RESOLVED_VERSION.$flag_pio_environment"
   fi
 
   echo "### Exporting firmware file..."
 
-  EXPORT_SUBDIR=exports/$PIO_ENVIRONMENT/feature=$FEATURE/
+  EXPORT_SUBDIR=$export_basedir/$flag_pio_environment/feature=$FEATURE/
   rm -fr $EXPORT_SUBDIR/
   mkdir -p $EXPORT_SUBDIR/
 
-  cp .pioenvs/$PIO_ENVIRONMENT/firmware.bin $EXPORT_SUBDIR/$FIRMWARE_FILENAME_BASE.bin
-  cp .pioenvs/$PIO_ENVIRONMENT/firmware.elf $EXPORT_SUBDIR/$FIRMWARE_FILENAME_BASE.elf
+  cp .pioenvs/$flag_pio_environment/firmware.bin $EXPORT_SUBDIR/$FIRMWARE_FILENAME_BASE.bin
+  cp .pioenvs/$flag_pio_environment/firmware.elf $EXPORT_SUBDIR/$FIRMWARE_FILENAME_BASE.elf
   if [ -e main4ino-description.json ]
   then
     cp main4ino-description.json $EXPORT_SUBDIR/$FIRMWARE_FILENAME_BASE.description.json
@@ -142,14 +167,14 @@ then
   fi
 
   echo "### Uploading..."
-  platformio run -e $PIO_ENVIRONMENT --target upload $UPLOAD_COMMAND_SUFFIX
+  platformio run -e $flag_pio_environment --target upload $UPLOAD_COMMAND_SUFFIX
 
   if [ -n "$BACKUP_IMAGE" ]
   then
     echo "### Backing up image..."
-    mkdir -p $LOG_SUBDIR/$RESOLVED_VERSION/
-    rm -f $LOG_SUBDIR/$RESOLVED_VERSION/*
-    find . -name *.elf | xargs -I% cp -f % $LOG_SUBDIR/$RESOLVED_VERSION/
+    mkdir -p $log_basedir/$RESOLVED_VERSION/
+    rm -f $log_basedir/$RESOLVED_VERSION/*
+    find . -name *.elf | xargs -I% cp -f % $log_basedir/$RESOLVED_VERSION/
   fi
 
 fi
@@ -161,17 +186,17 @@ then
   rm -fr data
   ln -s `readlink -e $TUNING_PATH` data
   echo "### Uploading $TUNING_PATH"
-  platformio run -e $PIO_ENVIRONMENT --target buildfs
-  platformio run -e $PIO_ENVIRONMENT --target uploadfs
+  platformio run -e $flag_pio_environment --target buildfs
+  platformio run -e $flag_pio_environment --target uploadfs
 fi
 
 
 if [ -n "$MONITOR" ]
 then
   echo "### Backing up logs..."
-  mkdir -p $LOG_SUBDIR/$RESOLVED_VERSION/
+  mkdir -p $log_basedir/$RESOLVED_VERSION/
   echo "### Monitoring..."
-  { ./serial_monitor 0 > >(tee $LOG_SUBDIR/$RESOLVED_VERSION/stdout.txt ); } 2> >(tee $LOG_SUBDIR/$RESOLVED_VERSION/stderr.txt )
+  { ./serial_monitor 0 > >(tee $log_basedir/$RESOLVED_VERSION/stdout.txt ); } 2> >(tee $log_basedir/$RESOLVED_VERSION/stderr.txt )
 fi
 
 echo "Done."
