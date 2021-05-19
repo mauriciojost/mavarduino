@@ -40,6 +40,14 @@ do
   esac
 done
 
+expected_platformio_version=5.1.1
+if [ $(platformio --version | awk '{print $4}') != "$expected_platformio_version" ]
+then
+  echo "Wrong platformio version: must be $expected_platformio_version but found"
+  platformio --version
+  exit 1
+fi
+
 VERSION_FROM_LIBRARY_JSON=$(cat library.json | jq -r .version)
 COMMIT_ID="`git rev-parse --short HEAD`" # current commit id
 COMMIT_ID_LONG="`git rev-parse HEAD`" # current commit id
