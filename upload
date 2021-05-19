@@ -44,6 +44,7 @@ function usage() {
     # ci/cd
     -b                      # backup the generated image under directory $log_basedir
 EOL
+  exit 0
 
 }
 
