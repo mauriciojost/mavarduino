@@ -146,9 +146,9 @@ then
 
   cp .pio/build/$flag_pio_environment/firmware.bin $export_subdir/$firmware_filename_base.bin
   cp .pio/build/$flag_pio_environment/firmware.elf $export_subdir/$firmware_filename_base.elf
-  if [ -e main4ino-description.json ]
+  if [ -e firmware-description.json ]
   then
-    cp main4ino-description.json $export_subdir/$firmware_filename_base.description.json
+    cp firmware-description.json $export_subdir/$firmware_filename_base.description.json
   fi
 fi
 
